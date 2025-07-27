@@ -4,6 +4,8 @@ import { useAuth } from './hooks/useAuth';
 import { initializeSampleData } from './hooks/useFirebase';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import TierView from './pages/TierView';
+import StatsPage from './pages/StatsPage';
 import './App.css';
 
 function App() {
@@ -40,15 +42,27 @@ function App() {
         <Routes>
           <Route 
             path="/login" 
-            element={user ? <Navigate to="/" replace /> : <Login />} 
+            element={user ? <Navigate to="/dashboard" replace /> : <Login />} 
           />
           <Route 
-            path="/" 
+            path="/dashboard" 
             element={user ? <Dashboard /> : <Navigate to="/login" replace />} 
           />
           <Route 
+            path="/tiers" 
+            element={user ? <TierView /> : <Navigate to="/login" replace />} 
+          />
+          <Route 
+            path="/stats" 
+            element={user ? <StatsPage /> : <Navigate to="/login" replace />} 
+          />
+          <Route 
+            path="/" 
+            element={<Navigate to="/dashboard" replace />} 
+          />
+          <Route 
             path="*" 
-            element={<Navigate to={user ? "/" : "/login"} replace />} 
+            element={<Navigate to={user ? "/dashboard" : "/login"} replace />} 
           />
         </Routes>
       </div>

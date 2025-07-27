@@ -88,10 +88,8 @@ export const useAppStore = create(
       
       // Ratings from Firebase  
       ratings: [],
-      
-      // UI state
+        // UI state
       selectedCategory: 'All',
-      currentView: 'dashboard', // dashboard, tier, stats
       isRatingModalOpen: false,
       selectedFoodItem: null,
       loading: false,
@@ -111,7 +109,6 @@ export const useAppStore = create(
 
       // UI actions
       setSelectedCategory: (category) => set({ selectedCategory: category }),
-      setCurrentView: (view) => set({ currentView: view }),
       
       openRatingModal: (foodItem) => set({ 
         isRatingModalOpen: true, 

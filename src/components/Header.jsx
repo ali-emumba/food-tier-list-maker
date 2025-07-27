@@ -1,8 +1,20 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
-const Header = ({ activeView, onViewChange }) => {
+const Header = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const getActiveView = () => {
+    if (location.pathname === '/dashboard') return 'dashboard';
+    if (location.pathname === '/tiers') return 'tiers';
+    if (location.pathname === '/stats') return 'stats';
+    return 'dashboard';
+  };
+
+  const activeView = getActiveView();
 
   return (
     <header className="bg-white shadow">
@@ -16,7 +28,7 @@ const Header = ({ activeView, onViewChange }) => {
             <div className="flex items-center space-x-4">
             <nav className="flex space-x-1">
               <button
-                onClick={() => onViewChange && onViewChange('dashboard')}
+                onClick={() => navigate('/dashboard')}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeView === 'dashboard'
                     ? 'bg-primary-100 text-primary-700'
@@ -25,7 +37,7 @@ const Header = ({ activeView, onViewChange }) => {
               >
                 📊 Dashboard
               </button>              <button
-                onClick={() => onViewChange && onViewChange('tiers')}
+                onClick={() => navigate('/tiers')}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeView === 'tiers'
                     ? 'bg-primary-100 text-primary-700'
@@ -35,7 +47,7 @@ const Header = ({ activeView, onViewChange }) => {
                 🏆 Tier View
               </button>
               <button
-                onClick={() => onViewChange && onViewChange('stats')}
+                onClick={() => navigate('/stats')}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeView === 'stats'
                     ? 'bg-primary-100 text-primary-700'
