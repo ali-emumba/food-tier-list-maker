@@ -4,7 +4,7 @@
 
 ## Project Overview
 
-This is a React Vite application for a Food Tier List Maker with Firebase integration. The application allows users to authenticate with hardcoded credentials and rate food items in different categories.
+This is a React Vite application for a Food Tier List Maker with Firebase integration. The application allows users to create accounts and rate food items across different categories with real-time statistics and tier rankings.
 
 ## Tech Stack
 
@@ -16,11 +16,13 @@ This is a React Vite application for a Food Tier List Maker with Firebase integr
 
 ## Key Features
 
-- Authentication with hardcoded user credentials
-- Food items categorized by type (Fast Food, Desi, Bakery, Drinks, Snacks)
+- User authentication (sign up/sign in with Firebase Auth)
+- Food items categorized by type (Diet Meals, Curry, Rice, Snacks)
 - Rating system (0-10) for each food item
 - Tier system based on average scores (Good: 9-10, OK: 7-8.9, Maybe: 5-6.9, NO: below 5)
-- Firebase Firestore for data persistence
+- Real-time statistics dashboard with charts and analytics
+- Category filtering and live data updates
+- Firebase Firestore for data persistence and real-time sync
 
 ## Code Style Guidelines
 
