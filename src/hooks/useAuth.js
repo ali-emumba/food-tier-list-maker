@@ -7,51 +7,68 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
+import { useUserStore } from '../store/userStore';
 
 export const useAuth = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
+  const { 
+    user, 
+    isAuthenticated, 
+    isAdmin, 
+    userLoading: loading,
+    userError: error,
+    setUser, 
+    clearUser, 
+    setUserLoading, 
+    setUserError 
+  } = useUserStore();
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Get additional user data from Firestore
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        const userData = userDoc.data();
-        setUser({
-          uid: user.uid,
-          email: user.email,
-          displayName: userData?.displayName || user.email,
-          ...userData
-        });
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          // Get additional user data from Firestore
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          const userData = userDoc.data();
+          
+          const fullUser = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: userData?.displayName || firebaseUser.email,
+            ...userData
+          };
+          
+          setUser(fullUser);
+        } catch (err) {
+          console.error('Error fetching user data:', err);
+          setUserError(err.message);
+          // Still set basic user data even if Firestore fetch fails
+          setUser({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.email
+          });
+        }
       } else {
-        setUser(null);
+        clearUser();
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
-
+  }, [setUser, clearUser, setUserError]);
   const signIn = async (email, password) => {
     try {
-      setError(null);
-      setLoading(true);
+      setUserError(null);
+      setUserLoading(true);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       return userCredential.user;
     } catch (err) {
-      setError(err.message);
+      setUserError(err.message);
       throw err;
-    } finally {
-      setLoading(false);
     }
   };
-
   const signUp = async (email, password, displayName) => {
     try {
-      setError(null);
-      setLoading(true);
+      setUserError(null);
+      setUserLoading(true);
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
       // Store additional user data in Firestore
@@ -63,21 +80,20 @@ export const useAuth = () => {
       
       return userCredential.user;
     } catch (err) {
-      setError(err.message);
+      setUserError(err.message);
       throw err;
-    } finally {
-      setLoading(false);
     }
   };
 
   const logout = async () => {
     try {
       await signOut(auth);
+      clearUser();
     } catch (err) {
-      setError(err.message);
+      setUserError(err.message);
       throw err;
     }
   };
 
-  return { user, loading, error, signIn, signUp, logout };
+  return { user, loading, error, signIn, signUp, logout, isAdmin, isAuthenticated };
 };

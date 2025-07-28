@@ -79,29 +79,18 @@ export const sampleFoodItems = [
 export const useAppStore = create(
   persist(
     (set, get) => ({
-      // User state - managed by Firebase Auth
-      user: null,
-      isAuthenticated: false,
-      
       // Food items from Firebase
       foodItems: [],
       
       // Ratings from Firebase  
       ratings: [],
-        // UI state
+      
+      // UI state
       selectedCategory: 'All',
       isRatingModalOpen: false,
       selectedFoodItem: null,
       loading: false,
       error: null,
-
-      // Auth actions - Firebase handles auth, this just updates local state
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
-      
-      logout: () => set({ 
-        user: null, 
-        isAuthenticated: false,
-      }),
 
       // Data actions - for Firebase integration
       setFoodItems: (foodItems) => set({ foodItems }),
@@ -122,14 +111,12 @@ export const useAppStore = create(
 
       setLoading: (loading) => set({ loading }),
       setError: (error) => set({ error }),
-      clearError: () => set({ error: null }),
-
-      // Get user's rating for a specific food item
-      getUserRating: (foodId) => {
-        const { ratings, user } = get();
-        if (!user) return null;
+      clearError: () => set({ error: null }),      // Get user's rating for a specific food item
+      getUserRating: (foodId, userId) => {
+        const { ratings } = get();
+        if (!userId) return null;
         
-        return ratings.find(r => r.foodItemId === foodId && r.userId === user.uid)?.score || null;
+        return ratings.find(r => r.foodItemId === foodId && r.userId === userId)?.score || null;
       },
 
       // Get average rating for a food item
@@ -241,14 +228,14 @@ export const useAppStore = create(
           categoryStats
         };
       }
-    }),
-    {
+    }),    {
       name: 'food-tier-storage',
       storage: createJSONStorage(() => localStorage),
-      // Only persist UI state, not data that comes from Firebase
+      // Only persist food and UI state, not user data (that's handled by userStore)
       partialize: (state) => ({
         selectedCategory: state.selectedCategory,
-        currentView: state.currentView,
+        foodItems: state.foodItems,
+        ratings: state.ratings
       }),
     }
   )

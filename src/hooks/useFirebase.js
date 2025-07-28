@@ -157,6 +157,81 @@ export const initializeSampleData = async () => {
   }
 };
 
+// Function to add a new food item (admin only)
+export const addFoodItem = async (foodItemData) => {
+  try {
+    // Create a unique ID based on the name
+    const id = foodItemData.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+    
+    const foodItemDoc = doc(db, 'foodItems', id);
+    
+    await setDoc(foodItemDoc, {
+      name: foodItemData.name,
+      category: foodItemData.category,
+      description: foodItemData.description || '',
+      createdAt: new Date().toISOString(),
+      addedBy: foodItemData.addedBy || 'admin'
+    });
+    
+    console.log('Food item added successfully:', id);
+    return { success: true, id };
+  } catch (error) {
+    console.error('Error adding food item:', error);
+    throw error;
+  }
+};
+
+// Function to update an existing food item (admin only)
+export const updateFoodItem = async (foodItemId, updateData) => {
+  try {
+    const foodItemDoc = doc(db, 'foodItems', foodItemId);
+    
+    await updateDoc(foodItemDoc, {
+      ...updateData,
+      updatedAt: new Date().toISOString()
+    });
+    
+    console.log('Food item updated successfully:', foodItemId);
+    return { success: true, id: foodItemId };
+  } catch (error) {
+    console.error('Error updating food item:', error);
+    throw error;
+  }
+};
+
+// Function to delete a food item (admin only)
+export const deleteFoodItem = async (foodItemId) => {
+  try {
+    // First, delete all ratings for this food item
+    const ratingsQuery = query(
+      collection(db, 'ratings'),
+      where('foodItemId', '==', foodItemId)
+    );
+    const ratingsSnapshot = await getDocs(ratingsQuery);
+    
+    // Delete ratings in batch
+    const batch = writeBatch(db);
+    ratingsSnapshot.docs.forEach((ratingDoc) => {
+      batch.delete(doc(db, 'ratings', ratingDoc.id));
+    });
+    
+    // Delete the food item
+    batch.delete(doc(db, 'foodItems', foodItemId));
+    
+    await batch.commit();
+    
+    console.log('Food item and related ratings deleted successfully:', foodItemId);
+    return { success: true, id: foodItemId, deletedRatings: ratingsSnapshot.docs.length };
+  } catch (error) {
+    console.error('Error deleting food item:', error);
+    throw error;
+  }
+};
+
 export const useFirebase = () => {
   const { 
     setFoodItems, 

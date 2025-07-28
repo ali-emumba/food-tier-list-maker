@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import TierView from './pages/TierView';
 import StatsPage from './pages/StatsPage';
+import AdminPage from './pages/AdminPage';
 import './App.css';
 
 function App() {
@@ -51,10 +52,13 @@ function App() {
           <Route 
             path="/tiers" 
             element={user ? <TierView /> : <Navigate to="/login" replace />} 
-          />
-          <Route 
+          />          <Route 
             path="/stats" 
             element={user ? <StatsPage /> : <Navigate to="/login" replace />} 
+          />
+          <Route 
+            path="/admin" 
+            element={user ? <AdminPage /> : <Navigate to="/login" replace />} 
           />
           <Route 
             path="/" 

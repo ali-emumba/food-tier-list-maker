@@ -2,12 +2,14 @@ import React, { useEffect } from 'react';
 import { useAppStore } from '../store';
 import { useAuth } from '../hooks/useAuth';
 import { useFoodItems, useRatings, addRating } from '../hooks/useFirebase';
+import { useUserStore } from '../store/userStore';
 import Header from '../components/Header';
 import FoodItemCard from '../components/FoodItemCard';
 import RatingModal from '../components/RatingModal';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { getUserDisplayName } = useUserStore();
   const { foodItems, loading: foodItemsLoading } = useFoodItems();
   const {
     selectedCategory,
@@ -15,22 +17,13 @@ const Dashboard = () => {
     selectedFoodItem,
     setFoodItems,
     setRatings,
-    setUser,
     setSelectedCategory,
     openRatingModal,
     closeRatingModal,
     getFoodItemsByCategory,
   } = useAppStore();
-
   // Available categories based on new food items
   const categories = ['All', 'Diet Meals', 'Curry', 'Rice', 'Snacks'];
-
-  // Update store with Firebase user
-  useEffect(() => {
-    if (user) {
-      setUser(user);
-    }
-  }, [user, setUser]);
 
   // Update store with Firebase food items
   useEffect(() => {
@@ -72,11 +65,10 @@ const Dashboard = () => {
       <Header />
       
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          {/* Category Filter */}
+        <div className="px-4 py-6 sm:px-0">          {/* Category Filter */}
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              Welcome back, {user?.displayName}!
+              Welcome back, {getUserDisplayName()}!
             </h1>
             <p className="text-gray-600 mb-6">
               Rate your favorite food items across {categories.length - 1} categories and see how they rank.
